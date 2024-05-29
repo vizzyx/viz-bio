@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .info, h1 {
+            display: none;
+        }
+        .info {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .info label {
+            font-weight: bold;
+        }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        .video-background iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #playButton {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            font-size: 20px;
+            z-index: 2;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-background" id="videoContainer">
+        <iframe id="rickrollVideo" src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1" allow="autoplay"></iframe>
+    </div>
+    <button id="playButton">Click to enter...</button>
+    <h1>System Information</h1>
+    <div class="info" id="infoIP">
+        <label>IP Address:</label> <span id="ip">Loading...</span>
+    </div>
+    <div class="info" id="infoLongitude">
+        <label>Longitude:</label> <span id="longitude">Loading...</span>
+    </div>
+    <div class="info" id="infoLatitude">
+        <label>Latitude:</label> <span id="latitude">Loading...</span>
+    </div>
+    <div class="info" id="infoProcessor">
+        <label>Processor:</label> <span id="processor">Loading...</span>
+    </div>
+    <div class="info" id="infoOS">
+        <label>Operating System:</label> <span id="os">Loading...</span>
+    </div>
+    <div class="info" id="infoBrowser">
+        <label>Web Browser:</label> <span id="browser">Loading...</span>
+    </div>
+    <div class="info" id="infoSent">
+        <label>Sent to my webhook :)</label>
+    </div>
+
+    <script>
+        async function getGeoLocation() {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            return data;
+        }
+
+        function getProcessorInfo() {
+            return navigator.hardwareConcurrency;
+        }
+
+        function getOSInfo() {
+            return navigator.platform;
+        }
+
+        function getBrowserInfo() {
+            return navigator.userAgent;
+        }
+
+        document.getElementById('playButton').addEventListener('click', async () => {
+            document.getElementById('playButton').style.display = 'none';
+
+            const videoContainer = document.getElementById('videoContainer');
+            const rickrollVideo = document.getElementById('rickrollVideo');
+            videoContainer.style.display = 'block';
+            rickrollVideo.src += "&autoplay=1"; // Add autoplay parameter
+
+            try {
+                const geoData = await getGeoLocation();
+                document.getElementById('ip').innerText = geoData.ip;
+                document.getElementById('longitude').innerText = geoData.longitude;
+                document.getElementById('latitude').innerText = geoData.latitude;
+            } catch (error) {
+                document.getElementById('ip').innerText = 'Error';
+                document.getElementById('longitude').innerText = 'Error';
+                document.getElementById('latitude').innerText = 'Error';
+            }
+
+            document.getElementById('processor').innerText = getProcessorInfo();
+            document.getElementById('os').innerText = getOSInfo();
+            document.getElementById('browser').innerText = getBrowserInfo();
+
+            document.querySelector('h1').style.display = 'block';
+            document.querySelectorAll('.info').forEach(element => {
+                element.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
